@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>0878fd38-087f-4d38-8b00-0f70a168ca92</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{0878FD38-087F-4D38-8B00-0F70A168CA92}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WorldExplorer</RootNamespace>
     <AssemblyName>WorldExplorer</AssemblyName>
@@ -29,25 +29,46 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>WorldExplorer.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="fNbt, Version=0.6.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\fNbt.0.6.3\lib\net35-client\fNbt.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Block.cs" />
+    <Compile Include="Chunk.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegionFile.cs" />
+    <Compile Include="SparseCollections\ComparableTuple2.cs" />
+    <Compile Include="SparseCollections\ComparableTuple3.cs" />
+    <Compile Include="SparseCollections\ComparableTuple4.cs" />
+    <Compile Include="SparseCollections\ComparableTuple5.cs" />
+    <Compile Include="SparseCollections\ComparableTuple6.cs" />
+    <Compile Include="SparseCollections\ComparableTuple7.cs" />
+    <Compile Include="SparseCollections\ComparableTuple8.cs" />
+    <Compile Include="SparseCollections\Sparse2DMatrix.cs" />
+    <Compile Include="SparseCollections\Sparse3DMatrix.cs" />
+    <Compile Include="SparseCollections\Sparse4DMatrix.cs" />
+    <Compile Include="SparseCollections\Sparse5DMatrix.cs" />
+    <Compile Include="SparseCollections\Sparse6DMatrix.cs" />
+    <Compile Include="SparseCollections\Sparse7DMatrix.cs" />
+    <Compile Include="SparseCollections\Sparse8DMatrix.cs" />
+    <Compile Include="SparseCollections\SparseArray.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>

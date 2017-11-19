@@ -9,7 +9,8 @@ Just download the executable and run it. Choose a folder where the world is in, 
 
 | Feature|
 | ------ |
-| Read the world |
-| Add ability for data values |
+| ~~Read the world~~ |
+| Render the world |
+| ~~Add ability for data values~~ |
 | Optimization |
 | Make it live (on servers with a plugin) |
