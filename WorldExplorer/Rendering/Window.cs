@@ -13,16 +13,17 @@ namespace WorldExplorer
         Window window;
         List<GameObject> regions = new List<GameObject>();
         public Wind(World world) {
-            window = new Window(500,500,"WorldExplorer");
+            window = new Window(500, 500, "WorldExplorer");
             window.Wake();
             int texId = window.loadImage("C:/Users/Aleks.Aleks-PC/Documents/Visual Studio 2017/Projects/Spark.GL/TestProject/opentksquare.png");
-            foreach(KeyValuePair<ComparableTuple2<int,int>,RegionFile> region in world.regions)
+            foreach (KeyValuePair<ComparableTuple2<int, int>, RegionFile> region in world.regions)
             {
                 GameObject reg = new GameObject("r" + region.Key.Item0 + "." + region.Key.Item1);
-                foreach(KeyValuePair<ComparableTuple2<int, int>, Column> column in region.Value.columns)
+                foreach (KeyValuePair<ComparableTuple2<int, int>, Column> column in region.Value.columns)
                 {
                     GameObject col = new GameObject("c" + column.Key.Item0 + "." + column.Key.Item1);
                     col.SetParent(reg);
+                    LinkedList<Tuple<Vec3[], Vec3[], Vec2[], Vec3>> meshs = new LinkedList<Tuple<Vec3[], Vec3[], Vec2[], Vec3>>();
                     foreach (KeyValuePair<ComparableTuple3<byte, byte, byte>, Block> block in column.Value.blocks)
                     {
                         Block b = block.Value;
@@ -31,28 +32,24 @@ namespace WorldExplorer
                         z = b.z + column.Value.zPos * 16;
                         y = b.y;
                         Block _t;
-                        Mesh m = CreateCustomMesh(
+                        Tuple<Vec3[], Vec3[], Vec2[], Vec3> m = CreateCustomMesh(
                             !column.Value.blocks.TryGetValue(b.x, (byte)(b.y + 1), b.z, out _t),
                             !column.Value.blocks.TryGetValue(b.x, (byte)(b.y - 1), b.z, out _t),
-                            !column.Value.blocks.TryGetValue(b.x, b.y, (byte)(b.z-1), out _t),
+                            !column.Value.blocks.TryGetValue(b.x, b.y, (byte)(b.z - 1), out _t),
                             !column.Value.blocks.TryGetValue(b.x, b.y, (byte)(b.z + 1), out _t),
-                            !column.Value.blocks.TryGetValue((byte)(b.x-1), b.y, b.z, out _t),
-                            !column.Value.blocks.TryGetValue((byte)(b.x+1), b.y, b.z, out _t));
-                        if (m.Triangles.Length == 0) continue;
-                        GameObject bGO = new GameObject("b" + x + "," + y + "," + z);
-                        MeshFilter mf = bGO.AddComponent<MeshFilter>();
-                        mf.mesh = m;
-                        bGO.transform.Position = new Vec3(x, y, z);
-                        bGO.SetParent(col);
+                            !column.Value.blocks.TryGetValue((byte)(b.x - 1), b.y, b.z, out _t),
+                            !column.Value.blocks.TryGetValue((byte)(b.x + 1), b.y, b.z, out _t), new Vec3(x, y, z));
+                        if (m.Item2.Length == 0) continue;
+                        meshs.AddFirst(m);
                     }
                     MeshFilter mF = col.AddComponent<MeshFilter>();
-                    mF.mesh = combineMeshes(col.GetChildren());
+                    mF.mesh = combineMeshes(meshs);
                     Material mat = new Material(new Vec3(0.7, 0.7, 0.7), new Vec3(0, 0, 0), new Vec3(0.9, 0.9, 0.9));
                     mF.material = mat;
                     mF.material.TextureID = texId;
                     col.AddComponent<MeshRenderer>();
                     col.transform.Position = new Vec3();
-                    foreach(GameObject go in col.GetChildren())
+                    foreach (GameObject go in col.GetChildren())
                     {
                         go.Delete();
                     }
@@ -66,9 +63,9 @@ namespace WorldExplorer
             t.w = window;
             t.cam = camera;
             window.Run();
-            
+
         }
-        private Mesh CreateCustomMesh(bool up, bool down, bool left, bool right, bool front, bool back)
+        private Tuple<Vec3[], Vec3[], Vec2[], Vec3> CreateCustomMesh(bool up, bool down, bool left, bool right, bool front, bool back, Vec3 pos)
         {
             
             Vec3[] verts = new Vec3[]
@@ -211,25 +208,24 @@ namespace WorldExplorer
                 new Vec2(-1.0f, 1.0f),
                 new Vec2(-1.0f, 0.0f)
             };
-            return new Mesh(verts, triangles, colors, textures);
+            return new Tuple<Vec3[],Vec3[],Vec2[],Vec3>(verts,triangles,textures,pos);
         }
 
-        private Mesh combineMeshes(params GameObject[] meshes)
+        private Mesh combineMeshes(LinkedList<Tuple<Vec3[],Vec3[],Vec2[],Vec3>> meshes)
         {
             List<Vec3> verts = new List<Vec3>();
             List<Vec3> colors = new List<Vec3>();
             List<Vec2> texs = new List<Vec2>();
             List<Vec3> tris = new List<Vec3>();
             int offset = 0;
-            foreach (GameObject go in meshes)
-            {
-                Vec3 pos = go.transform.Position;
-                Mesh mesh = go.GetComponent<MeshFilter>().mesh;
-                verts.AddRange(mesh.Verticies.Select(r => r + pos));
-                colors.AddRange(Enumerable.Repeat(new Vec3(), mesh.faces.Count));
-                texs.AddRange(mesh.Textures);
-                tris.AddRange(mesh.Triangles.Select(r => r += new Vec3(offset,offset,offset)));
-                offset += mesh.Verticies.Length;
+            var iter = meshes.GetEnumerator();
+            while (iter.MoveNext()) {
+                var go = iter.Current;
+                verts.AddRange(go.Item1.Select(r => r + go.Item4));
+                colors.AddRange(Enumerable.Repeat(new Vec3(), go.Item1.Length));
+                texs.AddRange(go.Item3);
+                tris.AddRange(go.Item2.Select(r => r += new Vec3(offset,offset,offset)));
+                offset += go.Item1.Length;
             }
             return new Mesh(verts.ToArray(), tris.ToArray(), colors.ToArray(), texs.ToArray());
         }
