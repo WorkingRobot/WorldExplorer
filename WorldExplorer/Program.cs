@@ -10,8 +10,10 @@ namespace WorldExplorer
     {
         public static void Main(string[] args)
         {
-            RegionFile.Read("C:/Users/Aleks.Aleks-PC/Desktop/generator/NBT/WORLD/region/r.0.0.mca");
-            System.Threading.Thread.Sleep(50000);
+            new Wind(new World("C:/Users/Aleks.Aleks-PC/Desktop/generator/NBT/WORLD/region/"));
+            //new World("C:/Users/Aleks.Aleks-PC/Desktop/generator/NBT/WORLD/region/");
+            //RegionFile.Read("C:/Users/Aleks.Aleks-PC/Desktop/generator/NBT/WORLD/region/r.0.0.mca");
+            //System.Threading.Thread.Sleep(50000);
         }
     }
 }

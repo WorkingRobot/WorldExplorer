@@ -8,7 +8,7 @@ namespace WorldExplorer
 {
     class RegionFile
     {
-        Sparse2DMatrix<int, int, Column> columns = new Sparse2DMatrix<int, int, Column>();
+        public Sparse2DMatrix<int, int, Column> columns = new Sparse2DMatrix<int, int, Column>();
 
         public static RegionFile Read(string filename)
         {
@@ -19,7 +19,7 @@ namespace WorldExplorer
             stream.Read(mcaHeader, 0, 8192);
             stream.Seek(0, SeekOrigin.Begin);
             List<byte[]> chunkLocs = new List<byte[]>();
-            for (int i = 0; i < 4096; i += 4)
+            for (int i = 128+64; i < 256; i += 4)
             {
                 byte[] inp = new byte[4];
                 stream.Read(inp, 0, 4);
@@ -42,6 +42,7 @@ namespace WorldExplorer
                     memstr.ReadByte();
                     NbtReader reader = new NbtReader(new DeflateStream(memstr,CompressionMode.Decompress));
                     columns.Add(new Column(((NbtCompound)reader.ReadAsTag()).Get<NbtCompound>("Level")));
+                    //return new RegionFile(columns);
                 }
                         
             }
@@ -54,6 +55,11 @@ namespace WorldExplorer
             {
                 this.columns[column.xPos, column.zPos] = column;
             }
+        }
+
+        public RegionFile(string filename)
+        {
+            columns = RegionFile.Read(filename).columns;
         }
     }
 }
