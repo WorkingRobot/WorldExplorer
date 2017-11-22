@@ -13,9 +13,10 @@ namespace WorldExplorer
         Window window;
         List<GameObject> regions = new List<GameObject>();
         public Wind(World world) {
+            Material mat = new Material(new Vec3(0.7, 0.7, 0.7), new Vec3(0, 0, 0), new Vec3(0.9, 0.9, 0.9));
             window = new Window(500, 500, "WorldExplorer");
             window.Wake();
-            int texId = window.loadImage("C:/Users/Aleks.Aleks-PC/Documents/Visual Studio 2017/Projects/Spark.GL/TestProject/opentksquare.png");
+            int texId = window.loadImage("C:/Users/Aleks.Aleks-PC/Desktop/generator/NBT/texpack/assets/minecraft/textures/blocks/planks_oak.png");
             foreach (KeyValuePair<ComparableTuple2<int, int>, RegionFile> region in world.regions)
             {
                 GameObject reg = new GameObject("r" + region.Key.Item0 + "." + region.Key.Item1);
@@ -43,16 +44,16 @@ namespace WorldExplorer
                         meshs.AddFirst(m);
                     }
                     MeshFilter mF = col.AddComponent<MeshFilter>();
-                    mF.mesh = combineMeshes(meshs);
-                    Material mat = new Material(new Vec3(0.7, 0.7, 0.7), new Vec3(0, 0, 0), new Vec3(0.9, 0.9, 0.9));
+                    mF.mesh = combineMeshes(meshs);//cleanMesh(combineMeshes(meshs)); the ctor kinda already cleans the mesh
                     mF.material = mat;
                     mF.material.TextureID = texId;
                     col.AddComponent<MeshRenderer>();
-                    col.transform.Position = new Vec3();
+                    //col.Active = new Random().NextDouble()>0.5;
                     foreach (GameObject go in col.GetChildren())
                     {
                         go.Delete();
                     }
+                    Console.WriteLine(column.Key.Item0 + "." + column.Key.Item1);
                 }
             }
             Camera camera = new PerspectiveCamera(0.1f, 1000, 1.3f);
@@ -131,7 +132,6 @@ namespace WorldExplorer
             {
                 tris.AddRange(new Vec3[] { new Vec3(20,21,22), new Vec3(20,22,23) });
             }
-            Vec3[] triangles = tris.ToArray();
             Vec3[] colors = new Vec3[]
             {
                 //left
@@ -208,7 +208,7 @@ namespace WorldExplorer
                 new Vec2(-1.0f, 1.0f),
                 new Vec2(-1.0f, 0.0f)
             };
-            return new Tuple<Vec3[],Vec3[],Vec2[],Vec3>(verts,triangles,textures,pos);
+            return new Tuple<Vec3[],Vec3[],Vec2[],Vec3>(verts,tris.ToArray(),textures,pos);
         }
 
         private Mesh combineMeshes(LinkedList<Tuple<Vec3[],Vec3[],Vec2[],Vec3>> meshes)
@@ -227,7 +227,42 @@ namespace WorldExplorer
                 tris.AddRange(go.Item2.Select(r => r += new Vec3(offset,offset,offset)));
                 offset += go.Item1.Length;
             }
-            return new Mesh(verts.ToArray(), tris.ToArray(), colors.ToArray(), texs.ToArray());
+            return new Mesh(verts, tris, colors, texs);
+        }
+
+        private Mesh cleanMesh(Mesh m)
+        {
+            int vertL = m.faces.Count;
+            Vec3[] tris = m.Triangles;
+            List<Vec3> verts = m.Verticies.ToList();
+            List<Vec2> texs = m.Textures.ToList();
+            for (int i = 0; i < vertL; i++)
+            {
+                if (!triAppear(i, tris))
+                {
+                    verts.RemoveAt(i);
+                    texs.RemoveAt(i);
+                    for(int j = 0; j < tris.Length; ++j)
+                    {
+                        if (tris[j].X > i) tris[j].X--;
+                        if (tris[j].Y > i) tris[j].Y--;
+                        if (tris[j].Z > i) tris[j].Z--;
+                    }
+                }
+            }
+            return new Mesh(verts, tris, Enumerable.Repeat(new Vec3(), verts.Count), texs);
+        }
+
+        private bool triAppear(int i, Vec3[] tris)
+        {
+            foreach(Vec3 tri in tris)
+            {
+                if (tri.X == i || tri.Y == i || tri.Z == i) 
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
     public class CameraRotationThing : Component
@@ -263,6 +298,7 @@ namespace WorldExplorer
             //lastmousepos = rot;
             t++;
             Console.WriteLine("{0},{1},{2}",cam.Position.X, cam.Position.Y, cam.Position.Z);
+            window.Title = window.FrameRate.ToString();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace WorldExplorer
                         {
                             if (blox[i] != 0)
                             {
-                                blocks[x, (byte)(y + sectionOffset), z] = new Block(x, y, z, blox[i], data[i]);
+                                blocks[x, (byte)(y + sectionOffset), z] = new Block(x, (byte)(y + sectionOffset), z, blox[i], data[i]);
                                 //Console.WriteLine(x + ", " + y + ", " + z + ": " + blox[i]);
                             }
                             ++i;

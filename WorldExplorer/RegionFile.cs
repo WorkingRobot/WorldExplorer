@@ -19,7 +19,7 @@ namespace WorldExplorer
             stream.Read(mcaHeader, 0, 8192);
             stream.Seek(0, SeekOrigin.Begin);
             List<byte[]> chunkLocs = new List<byte[]>();
-            for (int i = 128+64; i < 256; i += 4)
+            for (int i = 0; i < 4096; i += 4)
             {
                 byte[] inp = new byte[4];
                 stream.Read(inp, 0, 4);
